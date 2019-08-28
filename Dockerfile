@@ -1,9 +1,5 @@
 FROM python:3
+#RUN pip install -f
 
-ADD auction.py /
-
-# COPY requirements.txt requirements.txt
-# RUN pip install -f requirements.txt
-
-COPY . .
-CMD ["python3", "./auction.py"]
+COPY auction auction
+CMD ["python", "auction/auction.py"]

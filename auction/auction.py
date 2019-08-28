@@ -1,20 +1,20 @@
 """"
-
-
+@author: Puskar Pandey
+@description: This is simple auction program. It reads the input json and outputs the list of bid winners per
+              unit per site while ensuring the validity of the bidder as well as of the bid units.
 """
 import json
 
 
 class Auction:
-
     config = {}
     auctions = []
 
     def main(self):
         # load configuration file
-        self.config = self.read_json("config.json")
+        self.config = self.read_json('auction/config.json')
         # load list of auction
-        self.auctions = self.read_json("input.json")
+        self.auctions = self.read_json('auction/input.json')
         finalResult = []
         if len(self.auctions) < 1:
             print(json.dumps(finalResult))
@@ -25,7 +25,7 @@ class Auction:
                 if len(result) > 0:
                     finalResult.extend(result)
             self.write_json(finalResult)
-            print(finalResult)
+            print(json.dumps(finalResult))
 
     # Get the floor value for the site
     def get_floor_value(self, site):
@@ -73,13 +73,12 @@ class Auction:
             pass
         return data
 
-    # Write output to json file
+    # Write output to a json file
     def write_json(self, data):
         try:
-            with open("output.json", 'w+') as f:
+            with open('auction/output.json', 'w+') as f:
                 f.write(json.dumps(data))
         except Exception as e:
-            print(e)
             pass
 
     # Finds highest valid bidder per unit for given auction
@@ -93,13 +92,15 @@ class Auction:
             # make list of bids for given units; filters out units not involved in the auction
             bidsPerUnit = [bid for bid in auction["bids"] if bid["unit"] == unit]
             for bid in bidsPerUnit:
-                # filters unknown and invalid bidders
+                # Checks whether the bidder is allowed to bid on the site, if it is a known bidder
+                # and bid value isgreater than site's floor value
                 if bid["bidder"] in allowedBidder and self.is_known_bidder(bid["bidder"]) and floor <= bid["bid"]:
                     adjustment = self.get_adjustment(bid["bidder"])
                     if maxBidValue < (bid["bid"] + adjustment):
                         maxBidValue = bid["bid"]
                         highestBid = bid
-            result.append(highestBid)
+            if len(highestBid) > 0:
+                result.append(highestBid)
         return result
 
 
